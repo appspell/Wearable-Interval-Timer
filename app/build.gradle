@@ -11,7 +11,7 @@ android {
         minSdk 30
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "0.5"
 
     }
 
@@ -21,9 +21,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     buildFeatures {
-        viewBinding true
+        compose true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.3.2'
+    }
+    namespace 'com.appspell.sportintervaltimer'
 }
 
 dependencies {
@@ -31,6 +36,7 @@ dependencies {
     // General compose dependencies
     implementation "androidx.activity:activity-compose:1.6.0"
     implementation "androidx.compose.ui:ui-tooling-preview:1.2.1"
+
     // Other compose dependencies
 
     // Compose for Wear OS Dependencies
@@ -53,10 +59,8 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.2.1"
     debugImplementation "androidx.compose.ui:ui-tooling:1.2.1"
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'com.google.android.gms:play-services-wearable:18.0.0'
-    implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.wear:wear:1.2.0'
 }
