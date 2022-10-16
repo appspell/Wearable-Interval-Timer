@@ -1,6 +1,5 @@
 package com.appspell.sportintervaltimer
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
@@ -59,12 +59,12 @@ fun TimerSetupContent(
             workText = state.work,
             restText = state.rest,
             onStart = {},
-            onSetsAdd = {},
-            onSetsRemove = {},
-            onWorkAdd = {},
-            onWorkRemove = {},
-            onRestAdd = {},
-            onRestRemove = {},
+            onSetsAdd = { viewModel.onSetsAdd() },
+            onSetsRemove = { viewModel.onSetsRemove() },
+            onWorkAdd = { viewModel.onWorkAdd() },
+            onWorkRemove = { viewModel.onWorkRemove() },
+            onRestAdd = { viewModel.onRestAdd() },
+            onRestRemove = { viewModel.onRestRemove() },
             listState = listState
         )
     }
@@ -151,7 +151,7 @@ private fun TimePickerRow(
             .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 0.dp)
     ) {
         Button(
-            onClick = { onButtonAdd() },
+            onClick = { onButtonRemove() },
             colors = ButtonDefaults.secondaryButtonColors(),
             modifier = Modifier
                 .align(CenterVertically)
@@ -186,7 +186,7 @@ private fun TimePickerRow(
         }
 
         Button(
-            onClick = { onButtonRemove() },
+            onClick = { onButtonAdd() },
             colors = ButtonDefaults.secondaryButtonColors(),
             modifier = Modifier
                 .align(CenterVertically)

@@ -8,6 +8,6 @@ data class TimerSetupUIState(
 
 data class TimerSetupDataState(
     val sets: Int,
-    val work: Long,
-    val rest: Long
+    val workSeconds: Int,
+    val restSeconds: Int
 )
