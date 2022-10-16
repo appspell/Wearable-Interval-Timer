@@ -1,5 +1,6 @@
 package com.appspell.sportintervaltimer
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -8,13 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
@@ -29,18 +30,17 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberScalingLazyListState
+import com.appspell.sportintervaltimer.timersetup.TimerSetupViewModel
 
 private val BUTTON_SIZE = 38.dp
 
-@Preview(
-    device = Devices.WEAR_OS_LARGE_ROUND,
-    showSystemUi = true,
-    backgroundColor = 0xff000000,
-    showBackground = true
-)
 @Composable
-fun TimerSetupContent() {
+fun TimerSetupContent(
+    viewModel: TimerSetupViewModel = hiltViewModel()
+) {
     val listState = rememberScalingLazyListState()
+    val state by viewModel.uiState.collectAsState()
+
     Scaffold(
         timeText = {
             TimeText()
@@ -55,6 +55,9 @@ fun TimerSetupContent() {
         }
     ) {
         SetUpIntervalsContent(
+            setsText = state.sets,
+            workText = state.work,
+            restText = state.rest,
             onStart = {},
             onSetsAdd = {},
             onSetsRemove = {},
@@ -69,6 +72,9 @@ fun TimerSetupContent() {
 
 @Composable
 private fun SetUpIntervalsContent(
+    setsText: String,
+    workText: String,
+    restText: String,
     onStart: () -> Unit,
     onSetsAdd: () -> Unit,
     onSetsRemove: () -> Unit,
@@ -94,7 +100,7 @@ private fun SetUpIntervalsContent(
                 modifier = Modifier
                     .fillMaxWidth(),
                 rowName = stringResource(id = R.string.timer_setup_set),
-                defaultValue = "00:00",
+                defaultValue = setsText,
                 onButtonAdd = onSetsAdd,
                 onButtonRemove = onSetsRemove
             )
@@ -104,7 +110,7 @@ private fun SetUpIntervalsContent(
                 modifier = Modifier
                     .fillMaxWidth(),
                 rowName = stringResource(id = R.string.timer_setup_work),
-                defaultValue = "00:00",
+                defaultValue = workText,
                 onButtonAdd = onWorkAdd,
                 onButtonRemove = onWorkRemove
             )
@@ -114,7 +120,7 @@ private fun SetUpIntervalsContent(
                 modifier = Modifier
                     .fillMaxWidth(),
                 rowName = stringResource(id = R.string.timer_setup_rest),
-                defaultValue = "00:00",
+                defaultValue = restText,
                 onButtonAdd = onRestAdd,
                 onButtonRemove = onRestRemove
             )
