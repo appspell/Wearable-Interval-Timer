@@ -5,4 +5,10 @@
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
+    <string name="timer_setup_set">Sets</string>
+    <string name="button_plus">+</string>
+    <string name="button_minus">-</string>
+    <string name="timer_setup_work">Work</string>
+    <string name="timer_setup_rest">Rest</string>
+    <string name="timer_setup_start_button">Start</string>
 </resources>
