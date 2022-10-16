@@ -1,13 +1,12 @@
 package com.appspell.sportintervaltimer.timersetup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-private const val DEFAULT_SETS = 4
-private const val DEFAULT_SECONDS = 60
 
 private const val MIN_SECONDS = 5
 private const val STEP_SECONDS = 5
@@ -15,17 +14,33 @@ private const val STEP_SECONDS = 5
 private const val TIME_SEPARATOR = " : "
 
 @HiltViewModel
-class TimerSetupViewModel @Inject constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow<TimerSetupUIState>(DEFAULT_STATE.toUIState())
+class TimerSetupViewModel @Inject constructor(
+    private val repository: TimeSetupRepository
+) : ViewModel() {
+
+    private val _uiState =
+        MutableStateFlow<TimerSetupUIState>(TimeSetupRepository.DEFAULT_STATE.toUIState())
     val uiState: StateFlow<TimerSetupUIState> = _uiState
 
-    private var dataState = DEFAULT_STATE
+    private var dataState = TimeSetupRepository.DEFAULT_STATE
+        set(value) {
+            field = value
+            updateUiState()
+        }
+
+    init {
+        viewModelScope.launch {
+            repository.observeSavedInterval()
+                .collect { savedData ->
+                    dataState = savedData
+                }
+        }
+    }
 
     fun onSetsAdd() {
         dataState = dataState.copy(
             sets = dataState.sets + 1
         )
-        updateUiState()
     }
 
     fun onSetsRemove() {
@@ -36,14 +51,12 @@ class TimerSetupViewModel @Inject constructor() : ViewModel() {
                 0
             }
         )
-        updateUiState()
     }
 
     fun onWorkAdd() {
         dataState = dataState.copy(
             workSeconds = dataState.workSeconds + STEP_SECONDS
         )
-        updateUiState()
     }
 
     fun onWorkRemove() {
@@ -54,14 +67,12 @@ class TimerSetupViewModel @Inject constructor() : ViewModel() {
                 MIN_SECONDS
             }
         )
-        updateUiState()
     }
 
     fun onRestAdd() {
         dataState = dataState.copy(
             restSeconds = dataState.restSeconds + STEP_SECONDS
         )
-        updateUiState()
     }
 
     fun onRestRemove() {
@@ -72,7 +83,6 @@ class TimerSetupViewModel @Inject constructor() : ViewModel() {
                 MIN_SECONDS
             }
         )
-        updateUiState()
     }
 
     private fun updateUiState() {
@@ -95,11 +105,4 @@ class TimerSetupViewModel @Inject constructor() : ViewModel() {
     private fun Int.showTwoDigits(): String =
         if (this < 10) "0$this" else this.toString()
 
-    private companion object {
-        val DEFAULT_STATE = TimerSetupDataState(
-            sets = DEFAULT_SETS,
-            workSeconds = DEFAULT_SECONDS,
-            restSeconds = DEFAULT_SECONDS,
-        )
-    }
 }
