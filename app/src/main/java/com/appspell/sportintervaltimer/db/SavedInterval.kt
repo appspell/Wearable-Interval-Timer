@@ -8,7 +8,7 @@ data class SavedInterval(
     @PrimaryKey(
         autoGenerate = true
     )
-    val id: Int,
+    val id: Int?,
     val order: Int,
     val name: String,
     val sets: Int,

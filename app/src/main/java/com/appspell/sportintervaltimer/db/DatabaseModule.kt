@@ -25,6 +25,8 @@ class DatabaseModule {
             appContext,
             IntervalTimerDatabase::class.java,
             "IntervalTimerDatabase"
-        ).build()
+        )
+            .fallbackToDestructiveMigration() // TODO remove it
+            .build()
     }
 }

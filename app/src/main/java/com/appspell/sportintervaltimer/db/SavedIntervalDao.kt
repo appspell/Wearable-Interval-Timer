@@ -11,7 +11,7 @@ interface SavedIntervalDao {
     fun fetchAll(): List<SavedInterval>
 
     @Query("SELECT * FROM savedinterval WHERE name LIKE :name LIMIT 1")
-    fun fetchByName(name: String): SavedInterval
+    fun fetchByName(name: String): SavedInterval?
 
     @Query(
         "UPDATE savedinterval SET sets = :sets, workSeconds = :workSeconds, restSeconds = :restSeconds WHERE name LIKE :name"
