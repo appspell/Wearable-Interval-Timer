@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -24,6 +23,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.ScalingLazyColumn
+import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.Vignette
@@ -61,7 +61,8 @@ fun TimerSetupContent() {
             onWorkAdd = {},
             onWorkRemove = {},
             onRestAdd = {},
-            onRestRemove = {}
+            onRestRemove = {},
+            listState = listState
         )
     }
 }
@@ -75,9 +76,8 @@ private fun SetUpIntervalsContent(
     onWorkRemove: () -> Unit,
     onRestAdd: () -> Unit,
     onRestRemove: () -> Unit,
+    listState: ScalingLazyListState,
 ) {
-    val listState = rememberScalingLazyListState()
-
     ScalingLazyColumn(
         state = listState,
         contentPadding = PaddingValues(top = 16.dp),
