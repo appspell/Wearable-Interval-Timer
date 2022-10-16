@@ -58,7 +58,7 @@ fun TimerSetupContent(
             setsText = state.sets,
             workText = state.work,
             restText = state.rest,
-            onStart = {},
+            onStart = { viewModel.onSave() },
             onSetsAdd = { viewModel.onSetsAdd() },
             onSetsRemove = { viewModel.onSetsRemove() },
             onWorkAdd = { viewModel.onWorkAdd() },

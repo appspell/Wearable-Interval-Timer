@@ -6,11 +6,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-private const val DEFAULT_SETS = 4
-private const val DEFAULT_SECONDS = 60
+private const val DEFAULT_SETS = 6
+private const val DEFAULT_WORK_SECONDS = 90
+private const val DEFAULT_REST_SECONDS = 30
 
 // TODO replace it when implement a list
-private const val SAVED_DEFAULT_NAME = "Previously saved"
+private const val SAVED_DEFAULT_NAME = "Default"
 
 class TimeSetupRepository @Inject constructor(
     private val intervalsDao: SavedIntervalDao
@@ -34,7 +35,7 @@ class TimeSetupRepository @Inject constructor(
         )
     }
 
-    fun addNewInterval(data: TimerSetupDataState) {
+    private fun addNewInterval(data: TimerSetupDataState) {
         intervalsDao.insert(
             SavedInterval(
                 id = null,
@@ -57,8 +58,8 @@ class TimeSetupRepository @Inject constructor(
     companion object {
         val DEFAULT_STATE = TimerSetupDataState(
             sets = DEFAULT_SETS,
-            workSeconds = DEFAULT_SECONDS,
-            restSeconds = DEFAULT_SECONDS,
+            workSeconds = DEFAULT_WORK_SECONDS,
+            restSeconds = DEFAULT_REST_SECONDS,
         )
     }
 }

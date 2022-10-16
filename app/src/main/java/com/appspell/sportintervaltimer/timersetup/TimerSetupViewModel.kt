@@ -88,6 +88,10 @@ class TimerSetupViewModel @Inject constructor(
         )
     }
 
+    fun onSave() {
+        repository.saveInterval(dataState)
+    }
+
     private fun updateUiState() {
         _uiState.value = dataState.toUIState()
     }

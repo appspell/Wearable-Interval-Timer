@@ -26,7 +26,6 @@ class DatabaseModule {
             IntervalTimerDatabase::class.java,
             "IntervalTimerDatabase"
         )
-            .fallbackToDestructiveMigration() // TODO remove it
             .build()
     }
 }
