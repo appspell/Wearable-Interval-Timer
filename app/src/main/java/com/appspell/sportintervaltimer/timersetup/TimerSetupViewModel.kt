@@ -12,6 +12,8 @@ private const val DEFAULT_SECONDS = 60
 private const val MIN_SECONDS = 5
 private const val STEP_SECONDS = 5
 
+private const val TIME_SEPARATOR = " : "
+
 @HiltViewModel
 class TimerSetupViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow<TimerSetupUIState>(DEFAULT_STATE.toUIState())
@@ -80,9 +82,18 @@ class TimerSetupViewModel @Inject constructor() : ViewModel() {
     private fun TimerSetupDataState.toUIState() =
         TimerSetupUIState(
             sets = sets.toString(),
-            work = workSeconds.toString(),
-            rest = restSeconds.toString()
+            work = workSeconds.toTimeString(),
+            rest = restSeconds.toTimeString()
         )
+
+    private fun Int.toTimeString(): String {
+        val min = this / 60
+        val second = this - min * 60
+        return "${min.showTwoDigits()}$TIME_SEPARATOR${second.showTwoDigits()}"
+    }
+
+    private fun Int.showTwoDigits(): String =
+        if (this < 10) "0$this" else this.toString()
 
     private companion object {
         val DEFAULT_STATE = TimerSetupDataState(
