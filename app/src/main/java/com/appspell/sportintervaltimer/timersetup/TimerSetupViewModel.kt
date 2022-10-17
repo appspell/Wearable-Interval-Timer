@@ -2,12 +2,16 @@ package com.appspell.sportintervaltimer.timersetup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.appspell.sportintervaltimer.Navigation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val MIN_SECONDS = 5
@@ -23,6 +27,10 @@ class TimerSetupViewModel @Inject constructor(
     private val _uiState =
         MutableStateFlow<TimerSetupUIState>(TimeSetupRepository.DEFAULT_STATE.toUIState())
     val uiState: StateFlow<TimerSetupUIState> = _uiState
+
+    private val _navigation =
+        MutableSharedFlow<Navigation>(extraBufferCapacity = 1)
+    val navigation = _navigation.asSharedFlow()
 
     private var dataState = TimeSetupRepository.DEFAULT_STATE
         set(value) {
@@ -89,7 +97,12 @@ class TimerSetupViewModel @Inject constructor(
     }
 
     fun onSave() {
-        repository.saveInterval(dataState)
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                repository.saveInterval(dataState)
+            }
+            _navigation.emit(Navigation.Timer())
+        }
     }
 
     private fun updateUiState() {

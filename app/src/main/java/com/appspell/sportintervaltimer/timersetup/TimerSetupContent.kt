@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
@@ -31,15 +32,25 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberScalingLazyListState
 import com.appspell.sportintervaltimer.timersetup.TimerSetupViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 private val BUTTON_SIZE = 38.dp
 
 @Composable
 fun TimerSetupContent(
-    viewModel: TimerSetupViewModel = hiltViewModel()
+    viewModel: TimerSetupViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val listState = rememberScalingLazyListState()
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect("navigation") {
+        viewModel.navigation
+            .onEach { newNavigationEvent ->
+                navController.navigate(newNavigationEvent.route)
+            }.launchIn(this)
+    }
 
     Scaffold(
         timeText = {

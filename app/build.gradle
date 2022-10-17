@@ -59,6 +59,7 @@ dependencies {
 
     // For navigation within your app...
     implementation "androidx.wear.compose:compose-navigation:1.0.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.5.2"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"
