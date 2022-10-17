@@ -21,7 +21,8 @@ class MainActivity : ComponentActivity() {
             val navController = rememberSwipeDismissableNavController()
             SwipeDismissableNavHost(
                 navController = navController,
-                startDestination = TimerSetup().route
+//                startDestination = TimerSetup().route
+                startDestination = Timer().route
             ) {
                 composable(TimerSetup().route) {
                     TimerSetupContent(

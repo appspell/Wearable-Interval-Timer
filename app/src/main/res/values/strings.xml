@@ -11,4 +11,7 @@
     <string name="timer_setup_work">Work</string>
     <string name="timer_setup_rest">Rest</string>
     <string name="timer_setup_start_button">Start</string>
+    <string name="button_pause">pause</string>
+    <string name="button_continue">Continue</string>
+    <string name="button_skip">skip</string>
 </resources>
