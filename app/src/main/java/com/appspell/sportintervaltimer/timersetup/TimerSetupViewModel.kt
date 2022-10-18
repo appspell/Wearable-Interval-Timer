@@ -3,6 +3,7 @@ package com.appspell.sportintervaltimer.timersetup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appspell.sportintervaltimer.Navigation
+import com.appspell.sportintervaltimer.utils.toTimeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,16 +18,14 @@ import javax.inject.Inject
 private const val MIN_SECONDS = 5
 private const val STEP_SECONDS = 5
 
-private const val TIME_SEPARATOR = " : "
-
 @HiltViewModel
 class TimerSetupViewModel @Inject constructor(
     private val repository: TimeSetupRepository
 ) : ViewModel() {
 
     private val _uiState =
-        MutableStateFlow<TimerSetupUIState>(TimeSetupRepository.DEFAULT_STATE.toUIState())
-    val uiState: StateFlow<TimerSetupUIState> = _uiState
+        MutableStateFlow<TimerSetupUiState>(TimeSetupRepository.DEFAULT_STATE.toUIState())
+    val uiState: StateFlow<TimerSetupUiState> = _uiState
 
     private val _navigation =
         MutableSharedFlow<Navigation>(extraBufferCapacity = 1)
@@ -110,19 +109,9 @@ class TimerSetupViewModel @Inject constructor(
     }
 
     private fun TimerSetupDataState.toUIState() =
-        TimerSetupUIState(
+        TimerSetupUiState(
             sets = sets.toString(),
             work = workSeconds.toTimeString(),
             rest = restSeconds.toTimeString()
         )
-
-    private fun Int.toTimeString(): String {
-        val min = this / 60
-        val second = this - min * 60
-        return "${min.showTwoDigits()}$TIME_SEPARATOR${second.showTwoDigits()}"
-    }
-
-    private fun Int.showTwoDigits(): String =
-        if (this < 10) "0$this" else this.toString()
-
 }

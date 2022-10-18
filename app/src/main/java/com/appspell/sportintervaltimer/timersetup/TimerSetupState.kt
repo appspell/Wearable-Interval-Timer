@@ -1,6 +1,6 @@
 package com.appspell.sportintervaltimer.timersetup
 
-data class TimerSetupUIState(
+data class TimerSetupUiState(
     val sets: String,
     val work: String,
     val rest: String
