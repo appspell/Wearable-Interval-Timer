@@ -28,7 +28,8 @@ class TimerRepository @Inject constructor(
         MutableStateFlow<TimerDataState>(DEFAULT_STATE)
     val dataState = _dataState.asSharedFlow()
 
-    private val time = DateTime()
+    @Volatile
+    private var isTimerStarted = false
 
     fun reset() {
         val savedData = intervalsDao.fetchByName(SAVED_DEFAULT_NAME)
@@ -37,13 +38,15 @@ class TimerRepository @Inject constructor(
 
     suspend fun resume() {
         flow {
-            while (true) {
+            isTimerStarted = true
+            while (isTimerStarted) {
                 emit(_dataState.value)
-                delay(1000)
+                delay(16)
             }
         }
             .map { state ->
-                val timeLeftMillis = state.currentRoundEndMillis - DateTime.now().millis
+                val currentTime = DateTime.now().millis
+                val timeLeftMillis = state.currentRoundEndMillis - currentTime
                 val progress = timeLeftMillis.toFloat() /
                         TimeUnit.SECONDS.toMillis(
                             state.getRoundTimeSeconds(state.currentType).toLong()
@@ -65,16 +68,17 @@ class TimerRepository @Inject constructor(
                         UNDEFINED -> PREPARE
                     }
                     val currentSet =
-                        if (nextType == WORK) state.currentSet - 1 else state.currentSet
+                        if (nextType == REST) state.currentSet - 1 else state.currentSet
 
-                    val timeEndMillis = state.getEndTimeMillis(nextType)
-                    val timeLeftMillis = timeEndMillis - time.millis
+                    val nextRoundTimeSeconds =state.getRoundTimeSeconds(nextType)
+                    val nextTimeEndMillis = currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
+
                     state.copy(
                         currentType = nextType,
                         currentIteration = state.currentIteration - 1,
                         currentSet = currentSet,
-                        timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
-                        currentRoundEndMillis = timeEndMillis,
+                        timeLeftSeconds = nextRoundTimeSeconds,
+                        currentRoundEndMillis = nextTimeEndMillis,
                         currentProgress = 0.0f
                     )
                 } else {
@@ -87,13 +91,13 @@ class TimerRepository @Inject constructor(
 
             }
             .collect { state ->
-//                delay(200)
                 _dataState.value = state
             }
     }
 
     fun pause() {
-        // TODO stop job
+        isTimerStarted = false
+        // TODO cancel job
     }
 
     private fun TimerDataState.getRoundTimeSeconds(type: TimerType): Int {
@@ -105,12 +109,11 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun TimerDataState.getEndTimeMillis(type: TimerType): Long {
-        val currentTime = time.millis
-        val roundTime =
-            this.getRoundTimeSeconds(type).let { TimeUnit.SECONDS.toMillis(it.toLong()) }
-        return currentTime + roundTime
-    }
+//    private fun TimerDataState.getEndTimeMillis(type: TimerType): Long {
+//        val currentTime = DateTime.now().millis
+//        val roundTime = TimeUnit.SECONDS.toMillis(this.getRoundTimeSeconds(type).toLong())
+//        return currentTime + roundTime
+//    }
 
     private fun SavedInterval.toDataState() =
         TimerDataState(

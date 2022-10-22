@@ -46,7 +46,8 @@ fun TimerContent(
         TimerCountDown(
             setsText = state.sets,
             timerText = state.time,
-            type = state.type
+            type = state.type,
+            progress = state.progress
         )
     }
 }
@@ -56,13 +57,14 @@ private fun TimerCountDown(
     setsText: String,
     timerText: String,
     type: TimerType,
+    progress: Float
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(
-            progress = 0.3f,
+            progress = progress,
             modifier = Modifier.fillMaxSize(),
             strokeWidth = 4.dp,
         )

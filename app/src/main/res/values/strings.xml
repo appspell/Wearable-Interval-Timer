@@ -16,5 +16,5 @@
     <string name="button_skip">skip</string>
     <string name="type_prepare">Prepare</string>
     <string name="type_work">Work</string>
-    <string name="type_rest">Rork</string>
+    <string name="type_rest">Rest</string>
 </resources>
