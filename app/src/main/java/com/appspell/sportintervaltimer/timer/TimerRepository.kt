@@ -29,7 +29,7 @@ class TimerRepository @Inject constructor(
     val dataState = _dataState.asSharedFlow()
 
     @Volatile
-    private var isTimerStarted = false
+    private var isPaused = false
 
     fun reset() {
         val savedData = intervalsDao.fetchByName(SAVED_DEFAULT_NAME)
@@ -37,10 +37,15 @@ class TimerRepository @Inject constructor(
     }
 
     suspend fun resume() {
+        isPaused = false
+
         flow {
-            isTimerStarted = true
-            while (isTimerStarted) {
-                emit(_dataState.value)
+            while (!isPaused) {
+                emit(
+                    _dataState.value.copy(
+                        isPaused = false
+                    )
+                )
                 delay(16)
             }
         }
@@ -70,8 +75,9 @@ class TimerRepository @Inject constructor(
                     val currentSet =
                         if (nextType == REST) state.currentSet - 1 else state.currentSet
 
-                    val nextRoundTimeSeconds =state.getRoundTimeSeconds(nextType)
-                    val nextTimeEndMillis = currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
+                    val nextRoundTimeSeconds = state.getRoundTimeSeconds(nextType)
+                    val nextTimeEndMillis =
+                        currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
 
                     state.copy(
                         currentType = nextType,
@@ -96,8 +102,19 @@ class TimerRepository @Inject constructor(
     }
 
     fun pause() {
-        isTimerStarted = false
-        // TODO cancel job
+        isPaused = true
+        _dataState.value = _dataState.value.copy(
+            isPaused = true
+        )
+    }
+
+    fun skipAndPause() {
+        isPaused = true
+        _dataState.value = _dataState.value.copy(
+            isPaused = true,
+            timeLeftSeconds = 0,
+            currentRoundEndMillis = 0
+        )
     }
 
     private fun TimerDataState.getRoundTimeSeconds(type: TimerType): Int {
@@ -108,12 +125,6 @@ class TimerRepository @Inject constructor(
             else -> 0
         }
     }
-
-//    private fun TimerDataState.getEndTimeMillis(type: TimerType): Long {
-//        val currentTime = DateTime.now().millis
-//        val roundTime = TimeUnit.SECONDS.toMillis(this.getRoundTimeSeconds(type).toLong())
-//        return currentTime + roundTime
-//    }
 
     private fun SavedInterval.toDataState() =
         TimerDataState(
@@ -127,7 +138,8 @@ class TimerRepository @Inject constructor(
             currentRoundEndMillis = 0,
             currentType = UNDEFINED,
             currentSet = this.sets,
-            currentProgress = 0.0f
+            currentProgress = 0.0f,
+            isPaused = false
         )
 
     companion object {
@@ -141,7 +153,8 @@ class TimerRepository @Inject constructor(
             restSeconds = 0,
             currentIteration = 0,
             currentProgress = 0.0f,
-            timeLeftSeconds = 0
+            timeLeftSeconds = 0,
+            isPaused = false
         )
     }
 }

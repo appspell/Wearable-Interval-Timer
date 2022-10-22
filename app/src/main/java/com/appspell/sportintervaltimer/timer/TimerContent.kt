@@ -1,10 +1,12 @@
 package com.appspell.sportintervaltimer.timer
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Button
@@ -27,6 +28,10 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.appspell.sportintervaltimer.R
 import com.appspell.sportintervaltimer.R.drawable
+import com.appspell.sportintervaltimer.R.string
+import com.appspell.sportintervaltimer.theme.PrepareTheme
+import com.appspell.sportintervaltimer.theme.RestTheme
+import com.appspell.sportintervaltimer.theme.WorkTheme
 import com.appspell.sportintervaltimer.timer.TimerType.PREPARE
 import com.appspell.sportintervaltimer.timer.TimerType.REST
 import com.appspell.sportintervaltimer.timer.TimerType.UNDEFINED
@@ -38,16 +43,61 @@ fun TimerContent(
 ) {
     val state by viewModel.uiState.collectAsState()
 
+    when (state.type) {
+        WORK -> WorkTheme {
+            TimerScreenContent(
+                state = state,
+                onPause = { viewModel.onPause() },
+                onResume = { viewModel.onResume() },
+                onSkip = { viewModel.onSkip() })
+        }
+        REST -> RestTheme {
+            TimerScreenContent(
+                state = state,
+                onPause = { viewModel.onPause() },
+                onResume = { viewModel.onResume() },
+                onSkip = { viewModel.onSkip() })
+        }
+        else -> PrepareTheme {
+            TimerScreenContent(
+                state = state,
+                onPause = { viewModel.onPause() },
+                onResume = { viewModel.onResume() },
+                onSkip = { viewModel.onSkip() })
+        }
+    }
+}
+
+@Composable
+private fun TimerScreenContent(
+    state: TimerUiState,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onSkip: () -> Unit
+) {
     Scaffold(
+        modifier = Modifier
+            .background(MaterialTheme.colors.background),
         timeText = {
-            TimeText()
+            TimeText(
+                timeTextStyle = MaterialTheme.typography.caption3,
+                modifier = Modifier.padding(4.dp)
+            )
         },
     ) {
         TimerCountDown(
-            setsText = state.sets,
+            setsText = stringResource(
+                string.number_of_number,
+                state.currentSet,
+                state.allSets
+            ),
             timerText = state.time,
             type = state.type,
-            progress = state.progress
+            progress = state.progress,
+            isPaused = state.isPaused,
+            onPause = onPause,
+            onResume = onResume,
+            onSkip = onSkip
         )
     }
 }
@@ -57,7 +107,11 @@ private fun TimerCountDown(
     setsText: String,
     timerText: String,
     type: TimerType,
-    progress: Float
+    progress: Float,
+    isPaused: Boolean,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onSkip: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -65,14 +119,17 @@ private fun TimerCountDown(
     ) {
         CircularProgressIndicator(
             progress = progress,
-            modifier = Modifier.fillMaxSize(),
             strokeWidth = 4.dp,
+            modifier = Modifier
+                .fillMaxSize(),
         )
 
+        // Time
         Text(
             text = timerText,
-            fontWeight = FontWeight.Light,
-            style = MaterialTheme.typography.title1,
+            fontWeight = FontWeight.Normal,
+            style = MaterialTheme.typography.display1,
+            color = MaterialTheme.colors.primary,
             textAlign = TextAlign.Center,
         )
 
@@ -90,31 +147,34 @@ private fun TimerCountDown(
                 Column(
                     modifier = Modifier
                 ) {
+                    // sets left
                     Text(
                         text = setsText,
                         fontWeight = FontWeight.Light,
-                        style = MaterialTheme.typography.caption1,
+                        style = MaterialTheme.typography.caption2,
+                        color = MaterialTheme.colors.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .padding(4.dp)
                     )
+                    // type of activity
                     Text(
-                        text = when(type) {
+                        text = when (type) {
                             PREPARE -> stringResource(id = R.string.type_prepare)
-                            WORK ->  stringResource(id = R.string.type_work)
-                            REST ->  stringResource(id = R.string.type_rest)
+                            WORK -> stringResource(id = R.string.type_work)
+                            REST -> stringResource(id = R.string.type_rest)
                             UNDEFINED -> ""
                         },
                         fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.caption2,
+                        style = MaterialTheme.typography.caption3,
+                        color = MaterialTheme.colors.secondaryVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                     )
                 }
             }
-            Box(modifier = Modifier.weight(0.2f)) {
+            Box(modifier = Modifier.weight(0.3f)) {
                 // Spacer
             }
             Row(
@@ -122,26 +182,38 @@ private fun TimerCountDown(
                     .align(Alignment.CenterHorizontally)
                     .padding(8.dp)
             ) {
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .padding(4.dp),
-                    colors = ButtonDefaults.secondaryButtonColors(),
-                ) {
-                    Icon(
-                        painter = painterResource(id = drawable.ic_pause),
-                        contentDescription = stringResource(id = R.string.button_pause)
-                    )
-//                Icon(
-//                    painter = painterResource(id = drawable.ic_plus),
-//                    contentDescription = stringResource(id = R.string.button_continue)
-//                )
+                if (!isPaused) {
+                    Button(
+                        onClick = onPause,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .padding(4.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = drawable.ic_pause),
+                            contentDescription = stringResource(id = R.string.button_pause)
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = onResume,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .padding(4.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = drawable.ic_play),
+                            contentDescription = stringResource(id = R.string.button_continue)
+                        )
+                    }
                 }
+
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = onSkip,
                     modifier = Modifier
+                        .size(46.dp)
                         .padding(4.dp),
-                    colors = ButtonDefaults.secondaryButtonColors(),
+                    colors = ButtonDefaults.iconButtonColors(),
                 ) {
                     Icon(
                         painter = painterResource(id = drawable.ic_skip),

@@ -31,6 +31,7 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberScalingLazyListState
+import com.appspell.sportintervaltimer.theme.MainTheme
 import com.appspell.sportintervaltimer.timersetup.TimerSetupViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -51,33 +52,34 @@ fun TimerSetupContent(
                 navController.navigate(newNavigationEvent.route)
             }.launchIn(this)
     }
-
-    Scaffold(
-        timeText = {
-            TimeText()
-        },
-        vignette = {
-            Vignette(vignettePosition = VignettePosition.TopAndBottom)
-        },
-        positionIndicator = {
-            PositionIndicator(
-                scalingLazyListState = listState
+    MainTheme {
+        Scaffold(
+            timeText = {
+                TimeText()
+            },
+            vignette = {
+                Vignette(vignettePosition = VignettePosition.TopAndBottom)
+            },
+            positionIndicator = {
+                PositionIndicator(
+                    scalingLazyListState = listState
+                )
+            }
+        ) {
+            SetUpIntervalsContent(
+                setsText = state.sets,
+                workText = state.work,
+                restText = state.rest,
+                onStart = { viewModel.onSave() },
+                onSetsAdd = { viewModel.onSetsAdd() },
+                onSetsRemove = { viewModel.onSetsRemove() },
+                onWorkAdd = { viewModel.onWorkAdd() },
+                onWorkRemove = { viewModel.onWorkRemove() },
+                onRestAdd = { viewModel.onRestAdd() },
+                onRestRemove = { viewModel.onRestRemove() },
+                listState = listState
             )
         }
-    ) {
-        SetUpIntervalsContent(
-            setsText = state.sets,
-            workText = state.work,
-            restText = state.rest,
-            onStart = { viewModel.onSave() },
-            onSetsAdd = { viewModel.onSetsAdd() },
-            onSetsRemove = { viewModel.onSetsRemove() },
-            onWorkAdd = { viewModel.onWorkAdd() },
-            onWorkRemove = { viewModel.onWorkRemove() },
-            onRestAdd = { viewModel.onRestAdd() },
-            onRestRemove = { viewModel.onRestRemove() },
-            listState = listState
-        )
     }
 }
 
