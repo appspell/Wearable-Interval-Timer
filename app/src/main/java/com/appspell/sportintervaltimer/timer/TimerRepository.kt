@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import java.util.Calendar
+import org.joda.time.DateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ class TimerRepository @Inject constructor(
         MutableStateFlow<TimerDataState>(DEFAULT_STATE)
     val dataState = _dataState.asSharedFlow()
 
-    private val calendar = Calendar.getInstance()
+    private val time = DateTime()
 
     fun reset() {
         val savedData = intervalsDao.fetchByName(SAVED_DEFAULT_NAME)
@@ -43,66 +43,61 @@ class TimerRepository @Inject constructor(
             }
         }
             .map { state ->
-//                state.updateState()
-                state.copy(
-                    timeLeftSeconds = state.timeLeftSeconds - 1
-                )
+                val timeLeftMillis = state.currentRoundEndMillis - DateTime.now().millis
+                val progress = timeLeftMillis.toFloat() /
+                        TimeUnit.SECONDS.toMillis(
+                            state.getRoundTimeSeconds(state.currentType).toLong()
+                        )
+
+                if (timeLeftMillis <= 0) {
+                    // Round time is out
+                    if (state.currentIteration == 0) {
+                        // no more iterations
+                        // TODO exit logic
+                        pause()
+                        return@map state
+                    }
+                    // Set up new round
+                    val nextType = when (state.currentType) {
+                        PREPARE -> WORK
+                        WORK -> REST
+                        REST -> WORK
+                        UNDEFINED -> PREPARE
+                    }
+                    val currentSet =
+                        if (nextType == WORK) state.currentSet - 1 else state.currentSet
+
+                    val timeEndMillis = state.getEndTimeMillis(nextType)
+                    val timeLeftMillis = timeEndMillis - time.millis
+                    state.copy(
+                        currentType = nextType,
+                        currentIteration = state.currentIteration - 1,
+                        currentSet = currentSet,
+                        timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
+                        currentRoundEndMillis = timeEndMillis,
+                        currentProgress = 0.0f
+                    )
+                } else {
+                    // Continue with current rounds
+                    state.copy(
+                        timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
+                        currentProgress = 1.0f - progress
+                    )
+                }
+
             }
             .collect { state ->
+//                delay(200)
                 _dataState.value = state
             }
-
-    }
-
-    private fun TimerDataState.updateState(): TimerDataState {
-        return if (this.timeLeftSeconds <= 0) {
-            // time is out
-            if (this.currentIteration > 0) {
-                val nextType = when (this.currentType) {
-                    PREPARE -> WORK
-                    WORK -> REST
-                    REST -> WORK
-                    UNDEFINED -> PREPARE
-                }
-                val currentSet = if (nextType == WORK) {
-                    this.currentSet - 1
-                } else {
-                    this.currentSet
-                }
-                val currentRoundEndMillis = this.getEndTimeMillis()
-                val timeLeftSeconds =
-                    ((currentRoundEndMillis - calendar.timeInMillis) / 1000).toInt()
-
-                this.copy(
-                    currentIteration = this.currentIteration - 1,
-                    currentRoundEndMillis = currentRoundEndMillis,
-                    timeLeftSeconds = timeLeftSeconds,
-                    currentType = nextType,
-                    currentSet = currentSet,
-                    currentProgress = 0.0f
-                )
-            } else {
-                this // TODO EXIT
-            }
-        } else {
-            // update timer
-            val currentRoundEndMillis = this.getEndTimeMillis()
-            val timeLeftSeconds =
-                ((currentRoundEndMillis - calendar.timeInMillis) / 1000).toInt()
-            val progress = timeLeftSeconds.toFloat() / this.getRoundTimeSeconds()
-            this.copy(
-                timeLeftSeconds = timeLeftSeconds,
-                currentProgress = progress
-            )
-        }
     }
 
     fun pause() {
         // TODO stop job
     }
 
-    private fun TimerDataState.getRoundTimeSeconds(): Int {
-        return when (this.currentType) {
+    private fun TimerDataState.getRoundTimeSeconds(type: TimerType): Int {
+        return when (type) {
             PREPARE -> this.prepareSeconds
             WORK -> this.workSeconds
             REST -> this.restSeconds
@@ -110,9 +105,10 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun TimerDataState.getEndTimeMillis(): Long {
-        val currentTime = calendar.timeInMillis
-        val roundTime = this.getRoundTimeSeconds().let { TimeUnit.SECONDS.toMillis(it.toLong()) }
+    private fun TimerDataState.getEndTimeMillis(type: TimerType): Long {
+        val currentTime = time.millis
+        val roundTime =
+            this.getRoundTimeSeconds(type).let { TimeUnit.SECONDS.toMillis(it.toLong()) }
         return currentTime + roundTime
     }
 

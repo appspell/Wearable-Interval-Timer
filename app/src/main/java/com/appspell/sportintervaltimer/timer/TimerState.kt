@@ -13,12 +13,11 @@ data class TimerDataState(
     val workSeconds: Int,
     val restSeconds: Int,
 
-
+    val currentType: TimerType,
     val currentIteration: Int,
     val currentSet: Int,
     val timeLeftSeconds: Int,
     val currentRoundEndMillis: Long,
-    val currentType: TimerType,
     val currentProgress: Float,
 )
 

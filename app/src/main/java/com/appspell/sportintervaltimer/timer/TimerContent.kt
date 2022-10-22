@@ -27,6 +27,10 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.appspell.sportintervaltimer.R
 import com.appspell.sportintervaltimer.R.drawable
+import com.appspell.sportintervaltimer.timer.TimerType.PREPARE
+import com.appspell.sportintervaltimer.timer.TimerType.REST
+import com.appspell.sportintervaltimer.timer.TimerType.UNDEFINED
+import com.appspell.sportintervaltimer.timer.TimerType.WORK
 
 @Composable
 fun TimerContent(
@@ -42,6 +46,7 @@ fun TimerContent(
         TimerCountDown(
             setsText = state.sets,
             timerText = state.time,
+            type = state.type
         )
     }
 }
@@ -50,6 +55,7 @@ fun TimerContent(
 private fun TimerCountDown(
     setsText: String,
     timerText: String,
+    type: TimerType,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -92,7 +98,12 @@ private fun TimerCountDown(
                             .padding(4.dp)
                     )
                     Text(
-                        text = "TYPE", // TODO
+                        text = when(type) {
+                            PREPARE -> stringResource(id = R.string.type_prepare)
+                            WORK ->  stringResource(id = R.string.type_work)
+                            REST ->  stringResource(id = R.string.type_rest)
+                            UNDEFINED -> ""
+                        },
                         fontWeight = FontWeight.Normal,
                         style = MaterialTheme.typography.caption2,
                         textAlign = TextAlign.Center,
