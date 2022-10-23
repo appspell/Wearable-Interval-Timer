@@ -24,8 +24,7 @@ class TimerRepository @Inject constructor(
     private val intervalsDao: SavedIntervalDao
 ) {
 
-    private val _dataState =
-        MutableStateFlow<TimerDataState>(DEFAULT_STATE)
+    private val _dataState = MutableStateFlow<TimerDataState>(DEFAULT_STATE)
     val dataState = _dataState.asSharedFlow()
 
     @Volatile
@@ -37,6 +36,14 @@ class TimerRepository @Inject constructor(
     }
 
     suspend fun resume() {
+        if (isPaused) {
+            // if it's already paused we have to update End time
+            val newRoundEndMillis =
+                DateTime.now().millis + TimeUnit.SECONDS.toMillis(_dataState.value.timeLeftSeconds.toLong())
+            _dataState.value = _dataState.value.copy(
+                isPaused = false, currentRoundEndMillis = newRoundEndMillis
+            )
+        }
         isPaused = false
 
         flow {
@@ -48,14 +55,12 @@ class TimerRepository @Inject constructor(
                 )
                 delay(16)
             }
-        }
-            .map { state ->
+        }.map { state ->
                 val currentTime = DateTime.now().millis
                 val timeLeftMillis = state.currentRoundEndMillis - currentTime
-                val progress = timeLeftMillis.toFloat() /
-                        TimeUnit.SECONDS.toMillis(
-                            state.getRoundTimeSeconds(state.currentType).toLong()
-                        )
+                val progress = timeLeftMillis.toFloat() / TimeUnit.SECONDS.toMillis(
+                    state.getRoundTimeSeconds(state.currentType).toLong()
+                )
 
                 if (timeLeftMillis <= 0) {
                     // Round time is out
@@ -95,8 +100,7 @@ class TimerRepository @Inject constructor(
                     )
                 }
 
-            }
-            .collect { state ->
+            }.collect { state ->
                 _dataState.value = state
             }
     }
@@ -111,9 +115,7 @@ class TimerRepository @Inject constructor(
     fun skipAndPause() {
         isPaused = true
         _dataState.value = _dataState.value.copy(
-            isPaused = true,
-            timeLeftSeconds = 0,
-            currentRoundEndMillis = 0
+            isPaused = true, timeLeftSeconds = 0, currentRoundEndMillis = 0
         )
     }
 
@@ -126,21 +128,20 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun SavedInterval.toDataState() =
-        TimerDataState(
-            maxSets = this.sets,
-            prepareSeconds = PREPARE_TIMER_SECONDS,
-            workSeconds = this.workSeconds,
-            restSeconds = this.restSeconds,
+    private fun SavedInterval.toDataState() = TimerDataState(
+        maxSets = this.sets,
+        prepareSeconds = PREPARE_TIMER_SECONDS,
+        workSeconds = this.workSeconds,
+        restSeconds = this.restSeconds,
 
-            currentIteration = this.sets * 2,
-            timeLeftSeconds = 0,
-            currentRoundEndMillis = 0,
-            currentType = UNDEFINED,
-            currentSet = this.sets,
-            currentProgress = 0.0f,
-            isPaused = false
-        )
+        currentIteration = this.sets * 2,
+        timeLeftSeconds = 0,
+        currentRoundEndMillis = 0,
+        currentType = UNDEFINED,
+        currentSet = this.sets,
+        currentProgress = 0.0f,
+        isPaused = false
+    )
 
     companion object {
         val DEFAULT_STATE = TimerDataState(
