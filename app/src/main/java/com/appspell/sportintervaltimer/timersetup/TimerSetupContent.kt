@@ -105,7 +105,7 @@ private fun SetUpIntervalsContent(
     ) {
         item {
             TimerSetupStartButton(
-                onClick = onStart
+                onClick = onStart,
             )
         }
         item {
@@ -140,7 +140,8 @@ private fun SetUpIntervalsContent(
         }
         item {
             TimerSetupStartButton(
-                onClick = onStart
+                onClick = onStart,
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
@@ -216,9 +217,11 @@ private fun TimePickerRow(
 
 @Composable
 private fun TimerSetupStartButton(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
+        modifier = modifier,
         onClick = { onClick() },
     ) {
         Text(text = stringResource(R.string.timer_setup_start_button))

@@ -80,8 +80,8 @@ private fun TimerScreenContent(
             .background(MaterialTheme.colors.background),
         timeText = {
             TimeText(
-                timeTextStyle = MaterialTheme.typography.caption3,
-                modifier = Modifier.padding(4.dp)
+                timeTextStyle = MaterialTheme.typography.caption2,
+                modifier = Modifier.padding(8.dp)
             )
         },
     ) {
@@ -119,7 +119,7 @@ private fun TimerCountDown(
     ) {
         CircularProgressIndicator(
             progress = progress,
-            strokeWidth = 4.dp,
+            strokeWidth = 8.dp,
             modifier = Modifier
                 .fillMaxSize(),
         )
@@ -151,7 +151,7 @@ private fun TimerCountDown(
                     Text(
                         text = setsText,
                         fontWeight = FontWeight.Light,
-                        style = MaterialTheme.typography.caption2,
+                        style = MaterialTheme.typography.caption1,
                         color = MaterialTheme.colors.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -166,7 +166,7 @@ private fun TimerCountDown(
                             UNDEFINED -> ""
                         },
                         fontWeight = FontWeight.Normal,
-                        style = MaterialTheme.typography.caption3,
+                        style = MaterialTheme.typography.caption2,
                         color = MaterialTheme.colors.secondaryVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

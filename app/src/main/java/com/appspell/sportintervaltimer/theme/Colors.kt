@@ -12,10 +12,10 @@ import androidx.wear.compose.material.Colors
     background = Color(0xFF000000),
     surface = Color(0xFF263238),
     error = Color(0xFFe91e63),
-    onPrimary = Color(0xFF202124),
-    onSecondary = Color(0xFF202124),
-    onBackground = Color(0xFF202124),
-    onSurface = Color(0xFF202124),
+    onPrimary = Color(0xFF000a12),
+    onSecondary = Color(0xFF000a12),
+    onBackground = Color(0xFFffffff),
+    onSurface = Color(0xFFeceff1),
     onSurfaceVariant = Color(0xFFe0f2f1),
     onError = Color(0xFF202124)
 )
