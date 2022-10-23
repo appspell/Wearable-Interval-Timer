@@ -18,7 +18,7 @@ import javax.inject.Inject
 // TODO replace it when implement a list
 private const val SAVED_DEFAULT_NAME = "Default"
 
-private const val PREPARE_TIMER_SECONDS = 15
+private const val PREPARE_TIMER_SECONDS = 5
 
 class TimerRepository @Inject constructor(
     private val intervalsDao: SavedIntervalDao
