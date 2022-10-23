@@ -3,13 +3,13 @@ package com.appspell.sportintervaltimer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.wear.compose.material.Text
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.appspell.sportintervaltimer.Navigation.Finish
 import com.appspell.sportintervaltimer.Navigation.Timer
 import com.appspell.sportintervaltimer.Navigation.TimerSetup
+import com.appspell.sportintervaltimer.finish.FinishContent
 import com.appspell.sportintervaltimer.timer.TimerContent
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,7 +35,9 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 composable(Finish().route) {
-                    Text("Finish!!!!!!!!!!!!!!")
+                    FinishContent(
+                        navController = navController
+                    )
                 }
             }
         }
