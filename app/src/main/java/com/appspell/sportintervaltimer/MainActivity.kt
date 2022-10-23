@@ -7,6 +7,7 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.appspell.sportintervaltimer.Navigation.Finish
 import com.appspell.sportintervaltimer.Navigation.Timer
 import com.appspell.sportintervaltimer.Navigation.TimerSetup
 import com.appspell.sportintervaltimer.timer.TimerContent
@@ -29,7 +30,12 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 composable(Timer().route) {
-                   TimerContent()
+                    TimerContent(
+                        navController = navController
+                    )
+                }
+                composable(Finish().route) {
+                    Text("Finish!!!!!!!!!!!!!!")
                 }
             }
         }

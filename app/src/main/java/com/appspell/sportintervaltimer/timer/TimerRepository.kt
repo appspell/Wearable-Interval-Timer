@@ -56,53 +56,54 @@ class TimerRepository @Inject constructor(
                 delay(16)
             }
         }.map { state ->
-                val currentTime = DateTime.now().millis
-                val timeLeftMillis = state.currentRoundEndMillis - currentTime
-                val progress = timeLeftMillis.toFloat() / TimeUnit.SECONDS.toMillis(
-                    state.getRoundTimeSeconds(state.currentType).toLong()
-                )
+            val currentTime = DateTime.now().millis
+            val timeLeftMillis = state.currentRoundEndMillis - currentTime
+            val progress = timeLeftMillis.toFloat() / TimeUnit.SECONDS.toMillis(
+                state.getRoundTimeSeconds(state.currentType).toLong()
+            )
 
-                if (timeLeftMillis <= 0) {
-                    // Round time is out
-                    if (state.currentIteration == 0) {
-                        // no more iterations
-                        // TODO exit logic
-                        pause()
-                        return@map state
-                    }
-                    // Set up new round
-                    val nextType = when (state.currentType) {
-                        PREPARE -> WORK
-                        WORK -> REST
-                        REST -> WORK
-                        UNDEFINED -> PREPARE
-                    }
-                    val currentSet =
-                        if (nextType == REST) state.currentSet - 1 else state.currentSet
-
-                    val nextRoundTimeSeconds = state.getRoundTimeSeconds(nextType)
-                    val nextTimeEndMillis =
-                        currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
-
-                    state.copy(
-                        currentType = nextType,
-                        currentIteration = state.currentIteration - 1,
-                        currentSet = currentSet,
-                        timeLeftSeconds = nextRoundTimeSeconds,
-                        currentRoundEndMillis = nextTimeEndMillis,
-                        currentProgress = 0.0f
-                    )
-                } else {
-                    // Continue with current rounds
-                    state.copy(
-                        timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
-                        currentProgress = 1.0f - progress
+            if (timeLeftMillis <= 0) {
+                // Round time is out
+                if (state.currentIteration == 0) {
+                    // no more iterations
+                    pause()
+                    return@map state.copy(
+                        isFinished = true
                     )
                 }
+                // Set up new round
+                val nextType = when (state.currentType) {
+                    PREPARE -> WORK
+                    WORK -> REST
+                    REST -> WORK
+                    UNDEFINED -> PREPARE
+                }
+                val currentSet =
+                    if (nextType == REST) state.currentSet - 1 else state.currentSet
 
-            }.collect { state ->
-                _dataState.value = state
+                val nextRoundTimeSeconds = state.getRoundTimeSeconds(nextType)
+                val nextTimeEndMillis =
+                    currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
+
+                state.copy(
+                    currentType = nextType,
+                    currentIteration = state.currentIteration - 1,
+                    currentSet = currentSet,
+                    timeLeftSeconds = nextRoundTimeSeconds,
+                    currentRoundEndMillis = nextTimeEndMillis,
+                    currentProgress = 0.0f
+                )
+            } else {
+                // Continue with current rounds
+                state.copy(
+                    timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
+                    currentProgress = 1.0f - progress
+                )
             }
+
+        }.collect { state ->
+            _dataState.value = state
+        }
     }
 
     fun pause() {
@@ -140,7 +141,8 @@ class TimerRepository @Inject constructor(
         currentType = UNDEFINED,
         currentSet = this.sets,
         currentProgress = 0.0f,
-        isPaused = false
+        isPaused = false,
+        isFinished = false
     )
 
     companion object {
@@ -155,7 +157,8 @@ class TimerRepository @Inject constructor(
             currentIteration = 0,
             currentProgress = 0.0f,
             timeLeftSeconds = 0,
-            isPaused = false
+            isPaused = false,
+            isFinished = false
         )
     }
 }

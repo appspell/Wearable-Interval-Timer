@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -36,12 +38,22 @@ import com.appspell.sportintervaltimer.timer.TimerType.PREPARE
 import com.appspell.sportintervaltimer.timer.TimerType.REST
 import com.appspell.sportintervaltimer.timer.TimerType.UNDEFINED
 import com.appspell.sportintervaltimer.timer.TimerType.WORK
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun TimerContent(
     viewModel: TimerViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect("navigation") {
+        viewModel.navigation
+            .onEach { newNavigationEvent ->
+                navController.navigate(newNavigationEvent.route)
+            }.launchIn(this)
+    }
 
     when (state.type) {
         WORK -> WorkTheme {

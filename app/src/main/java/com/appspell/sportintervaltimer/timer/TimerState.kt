@@ -23,6 +23,7 @@ data class TimerDataState(
     val currentProgress: Float,
 
     val isPaused: Boolean,
+    val isFinished: Boolean
 )
 
 enum class TimerType {

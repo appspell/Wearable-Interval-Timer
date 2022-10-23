@@ -6,4 +6,6 @@ sealed class Navigation(open val route: String) {
 
     data class Timer(override val route: String = "Timer") : Navigation(route = route)
 
+    data class Finish(override val route: String = "Finish") : Navigation(route = route)
+
 }

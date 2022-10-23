@@ -52,6 +52,7 @@ fun TimerSetupContent(
                 navController.navigate(newNavigationEvent.route)
             }.launchIn(this)
     }
+
     MainTheme {
         Scaffold(
             timeText = {

@@ -2,12 +2,16 @@ package com.appspell.sportintervaltimer.timer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.appspell.sportintervaltimer.Navigation
+import com.appspell.sportintervaltimer.Navigation.Finish
 import com.appspell.sportintervaltimer.utils.toTimeString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,6 +25,10 @@ class TimerViewModel @Inject constructor(
         MutableStateFlow<TimerUiState>(TimerRepository.DEFAULT_STATE.toUIState())
     val uiState: StateFlow<TimerUiState> = _uiState
 
+    private val _navigation =
+        MutableSharedFlow<Navigation>(extraBufferCapacity = 1)
+    val navigation = _navigation.asSharedFlow()
+
     private var lastCoroutineTimerJob: Job? = null
 
     init {
@@ -33,6 +41,10 @@ class TimerViewModel @Inject constructor(
             repository.dataState
                 .collect { newState ->
                     _uiState.value = newState.toUIState()
+
+                    if (newState.isFinished) {
+                        _navigation.emit(Finish())
+                    }
                 }
         }
     }
