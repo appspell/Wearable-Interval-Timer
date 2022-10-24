@@ -1,6 +1,7 @@
 package com.appspell.sportintervaltimer
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
@@ -18,6 +19,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         setContent {
             val navController = rememberSwipeDismissableNavController()
             SwipeDismissableNavHost(
