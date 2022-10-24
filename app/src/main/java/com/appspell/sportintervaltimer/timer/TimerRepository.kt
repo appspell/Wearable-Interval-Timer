@@ -106,7 +106,12 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun vibrateWhenTimeIsRunningOut(timeLeftSeconds: Int) {
+    private fun vibrateWhenTimeIsRunningOut(timeLeftSeconds: Int, currentType: TimerType) {
+        if (currentType == TimerType.PREPARE) {
+            // Do not vibrate for prepare state
+            return
+        }
+
         if (timeLeftSeconds in 0..MIN_SECONDS_TO_VIBRATE) {
             if (prevSecondsStateVibration != timeLeftSeconds) {
                 prevSecondsStateVibration = timeLeftSeconds
