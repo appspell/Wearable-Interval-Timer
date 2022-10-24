@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
     version = 2,
     entities = [SavedInterval::class],
     autoMigrations = [
-        AutoMigration(from = 1, to = 2)
+        AutoMigration(from = 1, to = 2) // TODO manual migration?
     ]
 )
 abstract class IntervalTimerDatabase : RoomDatabase() {

@@ -21,8 +21,7 @@ class TimerViewModel @Inject constructor(
     private val repository: TimerRepository
 ) : ViewModel() {
 
-    private val _uiState =
-        MutableStateFlow<TimerUiState>(TimerRepository.DEFAULT_STATE.toUIState())
+    private val _uiState = MutableStateFlow(TimerRepository.DEFAULT_STATE.toUIState())
     val uiState: StateFlow<TimerUiState> = _uiState
 
     private val _navigation =

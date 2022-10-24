@@ -103,6 +103,20 @@ class TimerRepository @Inject constructor(
         }
     }
 
+    fun pause() {
+        isPaused = true
+        _dataState.value = _dataState.value.copy(
+            isPaused = true
+        )
+    }
+
+    fun skipAndPause() {
+        isPaused = true
+        _dataState.value = _dataState.value.copy(
+            isPaused = true, timeLeftSeconds = 0, currentRoundEndMillis = 0
+        )
+    }
+
     private fun vibrateWhenRoundEnded(currentType: TimerType) {
         if (currentType != UNDEFINED) {
             hapticService.longVibration()
@@ -151,24 +165,10 @@ class TimerRepository @Inject constructor(
         timeLeftSeconds: Int,
         progress: Float
     ): TimerDataState {
-        // Continue with current rounds
+        // Continue with current round
         return this.copy(
             timeLeftSeconds = timeLeftSeconds,
             currentProgress = 1.0f - progress
-        )
-    }
-
-    fun pause() {
-        isPaused = true
-        _dataState.value = _dataState.value.copy(
-            isPaused = true
-        )
-    }
-
-    fun skipAndPause() {
-        isPaused = true
-        _dataState.value = _dataState.value.copy(
-            isPaused = true, timeLeftSeconds = 0, currentRoundEndMillis = 0
         )
     }
 

@@ -48,7 +48,7 @@ fun TimerContent(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect("navigation") {
+    LaunchedEffect(Unit) {
         viewModel.navigation.onEach { newNavigationEvent ->
                 navController.popBackStack()
                 navController.navigate(

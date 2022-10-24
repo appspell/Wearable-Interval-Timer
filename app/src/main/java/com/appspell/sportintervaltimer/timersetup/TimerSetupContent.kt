@@ -46,7 +46,8 @@ fun TimerSetupContent(
     val listState = rememberScalingLazyListState()
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect("navigation") {
+    LaunchedEffect(Unit) {
+        // TODO revisit navigation
         viewModel.navigation
             .onEach { newNavigationEvent ->
                 navController.navigate(newNavigationEvent.route)
