@@ -86,3 +86,6 @@ lint/tmp/
 
 # keystore
 keystore/
+
+# firebase
+app/google-services.json

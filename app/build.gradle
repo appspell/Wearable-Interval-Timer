@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -12,8 +13,8 @@ android {
         applicationId "com.appspell.sportintervaltimer"
         minSdk 30
         targetSdk 33
-        versionCode 1
-        versionName "0.5"
+        versionCode 2
+        versionName "0.51"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -79,6 +80,10 @@ dependencies {
 
     // Time
     implementation 'net.danlew:android.joda:2.12.0'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:31.0.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     // Testing
     testImplementation "junit:junit:4.13.2"
