@@ -12,8 +12,12 @@ class HapticService @Inject constructor(
 ) {
 
     private val vibrator = context.getSystemService(VIBRATOR_SERVICE) as Vibrator?
-    private val shortEffect = VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE)
-    private val longEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
+
+    private val shortEffect =
+        VibrationEffect.createWaveform(longArrayOf(0, 150), VibrationEffect.DEFAULT_AMPLITUDE)
+
+    private val longEffect =
+        VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
 
     fun shortVibration() {
         vibrator?.vibrate(shortEffect)

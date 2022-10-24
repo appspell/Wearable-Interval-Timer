@@ -21,6 +21,8 @@ private const val SAVED_DEFAULT_NAME = "Default"
 
 private const val PREPARE_TIMER_SECONDS = 5
 
+private const val MIN_SECONDS_TO_VIBRATE = 5
+
 class TimerRepository @Inject constructor(
     private val intervalsDao: SavedIntervalDao,
     private val hapticService: HapticService
@@ -31,6 +33,9 @@ class TimerRepository @Inject constructor(
 
     @Volatile
     private var isPaused = false
+
+    @Volatile
+    private var prevSecondsStateVibration: Int = 0
 
     fun reset() {
         val savedData = intervalsDao.fetchByName(SAVED_DEFAULT_NAME)
@@ -101,9 +106,19 @@ class TimerRepository @Inject constructor(
                     currentProgress = 0.0f
                 )
             } else {
+                val timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt()
+
+                // Vibrate if time is almost run out
+                if (timeLeftSeconds in 0..MIN_SECONDS_TO_VIBRATE) {
+                    if (prevSecondsStateVibration != timeLeftSeconds) {
+                        prevSecondsStateVibration = timeLeftSeconds
+                        hapticService.shortVibration()
+                    }
+                }
+
                 // Continue with current rounds
                 state.copy(
-                    timeLeftSeconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftMillis).toInt(),
+                    timeLeftSeconds = timeLeftSeconds,
                     currentProgress = 1.0f - progress
                 )
             }

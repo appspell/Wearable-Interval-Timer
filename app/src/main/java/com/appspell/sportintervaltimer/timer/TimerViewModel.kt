@@ -66,6 +66,11 @@ class TimerViewModel @Inject constructor(
         onResume()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        repository.pause()
+    }
+
     private fun TimerDataState.toUIState() =
         TimerUiState(
             currentSet = this.currentSet,
