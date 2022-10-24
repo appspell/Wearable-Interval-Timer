@@ -60,7 +60,7 @@ captures/
 .cxx/
 
 # Google Services (e.g. APIs or Firebase)
-# google-services.json
+google-services.json
 
 # Freeline
 freeline.py
@@ -86,6 +86,7 @@ lint/tmp/
 
 # keystore
 keystore/
+keystore
 
 # firebase
 app/google-services.json
