@@ -81,18 +81,21 @@ class TimerRepository @Inject constructor(
                 }
 
                 // Start vibration
-                vibrateWhenRoundEnded(state)
+                vibrateWhenRoundEnded(currentType = state.currentType)
 
                 // Create a new round
-                createNewRound(state, currentTime)
+                state.createNewRound(currentTime = currentTime)
             } else {
                 val timeLeftSeconds = MILLISECONDS.toSeconds(timeLeftMillis).toInt()
 
                 // Vibrate if time is almost run out
-                vibrateWhenTimeIsRunningOut(timeLeftSeconds)
+                vibrateWhenTimeIsRunningOut(
+                    timeLeftSeconds = timeLeftSeconds,
+                    currentType = state.currentType
+                )
 
                 // Update state
-                updateTimeAndProgress(timeLeftSeconds, state, progress)
+                state.updateTimeAndProgress(timeLeftSeconds = timeLeftSeconds, progress = progress)
             }
 
         }.collect { state ->
@@ -100,14 +103,14 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun vibrateWhenRoundEnded(state: TimerDataState) {
-        if (state.currentType != UNDEFINED) {
+    private fun vibrateWhenRoundEnded(currentType: TimerType) {
+        if (currentType != UNDEFINED) {
             hapticService.longVibration()
         }
     }
 
     private fun vibrateWhenTimeIsRunningOut(timeLeftSeconds: Int, currentType: TimerType) {
-        if (currentType == TimerType.PREPARE) {
+        if (currentType == PREPARE) {
             // Do not vibrate for prepare state
             return
         }
@@ -120,23 +123,23 @@ class TimerRepository @Inject constructor(
         }
     }
 
-    private fun createNewRound(state: TimerDataState, currentTime: Long): TimerDataState {
-        val nextType = when (state.currentType) {
+    private fun TimerDataState.createNewRound(currentTime: Long): TimerDataState {
+        val nextType = when (currentType) {
             PREPARE -> WORK
             WORK -> REST
             REST -> WORK
             UNDEFINED -> PREPARE
         }
         val currentSet =
-            if (nextType == REST) state.currentSet - 1 else state.currentSet
+            if (nextType == REST) currentSet - 1 else currentSet
 
-        val nextRoundTimeSeconds = state.getRoundTimeSeconds(nextType)
+        val nextRoundTimeSeconds = getRoundTimeSeconds(nextType)
         val nextTimeEndMillis =
             currentTime + TimeUnit.SECONDS.toMillis(nextRoundTimeSeconds.toLong())
 
-        return state.copy(
+        return this.copy(
             currentType = nextType,
-            currentIteration = state.currentIteration - 1,
+            currentIteration = currentIteration - 1,
             currentSet = currentSet,
             timeLeftSeconds = nextRoundTimeSeconds,
             currentRoundEndMillis = nextTimeEndMillis,
@@ -144,13 +147,12 @@ class TimerRepository @Inject constructor(
         )
     }
 
-    private fun updateTimeAndProgress(
+    private fun TimerDataState.updateTimeAndProgress(
         timeLeftSeconds: Int,
-        state: TimerDataState,
         progress: Float
     ): TimerDataState {
         // Continue with current rounds
-        return state.copy(
+        return this.copy(
             timeLeftSeconds = timeLeftSeconds,
             currentProgress = 1.0f - progress
         )

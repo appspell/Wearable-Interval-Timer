@@ -32,6 +32,7 @@ class TimerViewModel @Inject constructor(
     private var lastCoroutineTimerJob: Job? = null
 
     init {
+        // TODO need refactoring
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 repository.reset()
