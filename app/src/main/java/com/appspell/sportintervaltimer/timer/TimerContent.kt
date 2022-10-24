@@ -134,6 +134,7 @@ private fun TimerCountDown(
     onResume: () -> Unit,
     onSkip: () -> Unit,
 ) {
+    // TODO replace with Constraint Layout, current implementation might have issues with different watch sizes
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

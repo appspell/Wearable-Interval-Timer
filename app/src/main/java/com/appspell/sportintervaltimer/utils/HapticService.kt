@@ -7,6 +7,7 @@ import android.os.Vibrator
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+// TODO revisit usage of this class
 class HapticService @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
