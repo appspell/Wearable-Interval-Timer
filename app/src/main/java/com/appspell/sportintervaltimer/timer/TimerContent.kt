@@ -29,7 +29,6 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import com.appspell.sportintervaltimer.Navigation
 import com.appspell.sportintervaltimer.R
 import com.appspell.sportintervaltimer.R.drawable
 import com.appspell.sportintervaltimer.R.string
@@ -45,43 +44,34 @@ import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun TimerContent(
-    viewModel: TimerViewModel = hiltViewModel(),
-    navController: NavHostController
+    viewModel: TimerViewModel = hiltViewModel(), navController: NavHostController
 ) {
     val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect("navigation") {
-        viewModel.navigation
-            .onEach { newNavigationEvent ->
+        viewModel.navigation.onEach { newNavigationEvent ->
                 navController.popBackStack()
                 navController.navigate(
-                    newNavigationEvent.route,
-                    NavOptions
-                        .Builder()
-                        .setLaunchSingleTop(true)
-                        .build()
+                    newNavigationEvent.route, NavOptions.Builder().setLaunchSingleTop(true).build()
                 )
             }.launchIn(this)
     }
 
     when (state.type) {
         WORK -> WorkTheme {
-            TimerScreenContent(
-                state = state,
+            TimerScreenContent(state = state,
                 onPause = { viewModel.onPause() },
                 onResume = { viewModel.onResume() },
                 onSkip = { viewModel.onSkip() })
         }
         REST -> RestTheme {
-            TimerScreenContent(
-                state = state,
+            TimerScreenContent(state = state,
                 onPause = { viewModel.onPause() },
                 onResume = { viewModel.onResume() },
                 onSkip = { viewModel.onSkip() })
         }
         else -> PrepareTheme {
-            TimerScreenContent(
-                state = state,
+            TimerScreenContent(state = state,
                 onPause = { viewModel.onPause() },
                 onResume = { viewModel.onResume() },
                 onSkip = { viewModel.onSkip() })
@@ -91,26 +81,19 @@ fun TimerContent(
 
 @Composable
 private fun TimerScreenContent(
-    state: TimerUiState,
-    onPause: () -> Unit,
-    onResume: () -> Unit,
-    onSkip: () -> Unit
+    state: TimerUiState, onPause: () -> Unit, onResume: () -> Unit, onSkip: () -> Unit
 ) {
     Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colors.background),
+        modifier = Modifier.background(MaterialTheme.colors.background),
         timeText = {
             TimeText(
-                timeTextStyle = MaterialTheme.typography.caption2,
-                modifier = Modifier.padding(8.dp)
+                timeTextStyle = MaterialTheme.typography.caption2, modifier = Modifier.padding(8.dp)
             )
         },
     ) {
         TimerCountDown(
             setsText = stringResource(
-                string.number_of_number,
-                state.currentSet,
-                state.allSets
+                string.number_of_number, state.currentSet, state.allSets
             ),
             timerText = state.time,
             type = state.type,
@@ -142,8 +125,7 @@ private fun TimerCountDown(
         CircularProgressIndicator(
             progress = progress,
             strokeWidth = 8.dp,
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
         )
 
         // Time
@@ -176,8 +158,7 @@ private fun TimerCountDown(
                         style = MaterialTheme.typography.caption1,
                         color = MaterialTheme.colors.secondary,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     // type of activity
                     Text(
@@ -191,58 +172,75 @@ private fun TimerCountDown(
                         style = MaterialTheme.typography.caption2,
                         color = MaterialTheme.colors.secondaryVariant,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
             }
             Box(modifier = Modifier.weight(0.3f)) {
                 // Spacer
             }
-            Row(
+            // Action buttons (play & skip)
+            TimerActionButtons(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(8.dp)
-            ) {
-                if (!isPaused) {
-                    Button(
-                        onClick = onPause,
-                        modifier = Modifier
-                            .size(46.dp)
-                            .padding(4.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = drawable.ic_pause),
-                            contentDescription = stringResource(id = R.string.button_pause)
-                        )
-                    }
-                } else {
-                    Button(
-                        onClick = onResume,
-                        modifier = Modifier
-                            .size(46.dp)
-                            .padding(4.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = drawable.ic_play),
-                            contentDescription = stringResource(id = R.string.button_continue)
-                        )
-                    }
-                }
+                    .padding(8.dp),
+                isPaused = isPaused,
+                onPause = onPause,
+                onResume = onResume,
+                onSkip = onSkip
+            )
+        }
+    }
+}
 
-                Button(
-                    onClick = onSkip,
-                    modifier = Modifier
-                        .size(46.dp)
-                        .padding(4.dp),
-                    colors = ButtonDefaults.iconButtonColors(),
-                ) {
-                    Icon(
-                        painter = painterResource(id = drawable.ic_skip),
-                        contentDescription = stringResource(id = R.string.button_skip)
-                    )
-                }
+@Composable
+private fun TimerActionButtons(
+    modifier: Modifier,
+    isPaused: Boolean,
+    onPause: () -> Unit,
+    onResume: () -> Unit,
+    onSkip: () -> Unit
+) {
+    Row(
+        modifier = modifier
+    ) {
+        if (!isPaused) {
+            Button(
+                onClick = onPause,
+                modifier = Modifier
+                    .size(46.dp)
+                    .padding(4.dp),
+            ) {
+                Icon(
+                    painter = painterResource(id = drawable.ic_pause),
+                    contentDescription = stringResource(id = string.button_pause)
+                )
             }
+        } else {
+            Button(
+                onClick = onResume,
+                modifier = Modifier
+                    .size(46.dp)
+                    .padding(4.dp),
+            ) {
+                Icon(
+                    painter = painterResource(id = drawable.ic_play),
+                    contentDescription = stringResource(id = string.button_continue)
+                )
+            }
+        }
+
+        Button(
+            onClick = onSkip,
+            modifier = Modifier
+                .size(46.dp)
+                .padding(4.dp),
+            colors = ButtonDefaults.iconButtonColors(),
+        ) {
+            Icon(
+                painter = painterResource(id = drawable.ic_skip),
+                contentDescription = stringResource(id = string.button_skip)
+            )
         }
     }
 }
