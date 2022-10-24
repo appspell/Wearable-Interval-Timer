@@ -6,6 +6,7 @@ import com.appspell.sportintervaltimer.timer.TimerType.PREPARE
 import com.appspell.sportintervaltimer.timer.TimerType.REST
 import com.appspell.sportintervaltimer.timer.TimerType.UNDEFINED
 import com.appspell.sportintervaltimer.timer.TimerType.WORK
+import com.appspell.sportintervaltimer.utils.HapticService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,7 +22,8 @@ private const val SAVED_DEFAULT_NAME = "Default"
 private const val PREPARE_TIMER_SECONDS = 5
 
 class TimerRepository @Inject constructor(
-    private val intervalsDao: SavedIntervalDao
+    private val intervalsDao: SavedIntervalDao,
+    private val hapticService: HapticService
 ) {
 
     private val _dataState = MutableStateFlow<TimerDataState>(DEFAULT_STATE)
@@ -63,6 +65,11 @@ class TimerRepository @Inject constructor(
             )
 
             if (timeLeftMillis <= 0) {
+                // Start vibration
+                if (state.currentType != UNDEFINED) {
+                    hapticService.longVibration()
+                }
+
                 // Round time is out
                 if (state.currentIteration == 0) {
                     // no more iterations
