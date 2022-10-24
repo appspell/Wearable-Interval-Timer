@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
@@ -41,7 +42,14 @@ fun FinishContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
-                        navController.navigate(Navigation.TimerSetup().route)
+                        navController.popBackStack()
+                        navController.navigate(
+                            Navigation.TimerSetup().route,
+                            NavOptions
+                                .Builder()
+                                .setLaunchSingleTop(true)
+                                .build()
+                        )
                     },
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally

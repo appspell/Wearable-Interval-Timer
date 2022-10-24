@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -28,6 +29,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
+import com.appspell.sportintervaltimer.Navigation
 import com.appspell.sportintervaltimer.R
 import com.appspell.sportintervaltimer.R.drawable
 import com.appspell.sportintervaltimer.R.string
@@ -51,7 +53,14 @@ fun TimerContent(
     LaunchedEffect("navigation") {
         viewModel.navigation
             .onEach { newNavigationEvent ->
-                navController.navigate(newNavigationEvent.route)
+                navController.popBackStack()
+                navController.navigate(
+                    newNavigationEvent.route,
+                    NavOptions
+                        .Builder()
+                        .setLaunchSingleTop(true)
+                        .build()
+                )
             }.launchIn(this)
     }
 
