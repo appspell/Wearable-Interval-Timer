@@ -44,7 +44,7 @@ fun FinishContent(
                     .clickable {
                         navController.popBackStack()
                         navController.navigate(
-                            Navigation.TimerSetup().route,
+                            Navigation.TimerSetup.route,
                             NavOptions
                                 .Builder()
                                 .setLaunchSingleTop(true)
