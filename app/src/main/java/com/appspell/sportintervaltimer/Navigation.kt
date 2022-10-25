@@ -2,10 +2,10 @@ package com.appspell.sportintervaltimer
 
 sealed class Navigation(open val route: String) {
 
-    data class TimerSetup(override val route: String = "TimerSetup") : Navigation(route = route)
+    object TimerSetup : Navigation(route = "TimerSetup")
 
-    data class Timer(override val route: String = "Timer") : Navigation(route = route)
+    object Timer : Navigation(route = "Timer")
 
-    data class Finish(override val route: String = "Finish") : Navigation(route = route)
+    object Finish : Navigation(route = "Finish")
 
 }

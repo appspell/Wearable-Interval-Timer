@@ -99,7 +99,7 @@ class TimerSetupViewModel @Inject constructor(
             withContext(Dispatchers.Default) {
                 repository.saveInterval(dataState)
             }
-            _navigation.emit(Navigation.Timer())
+            _navigation.emit(Navigation.Timer)
         }
     }
 

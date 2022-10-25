@@ -43,7 +43,7 @@ class TimerViewModel @Inject constructor(
                     _uiState.value = newState.toUIState()
 
                     if (newState.isFinished) {
-                        _navigation.emit(Finish())
+                        _navigation.emit(Finish)
                     }
                 }
         }
