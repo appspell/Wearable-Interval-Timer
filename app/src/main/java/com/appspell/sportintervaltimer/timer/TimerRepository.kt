@@ -22,7 +22,7 @@ private const val SAVED_DEFAULT_NAME = "Default"
 
 private const val PREPARE_TIMER_SECONDS = 5
 
-private const val MIN_SECONDS_TO_VIBRATE = 5
+private const val MIN_SECONDS_TO_VIBRATE = 3
 
 class TimerRepository @Inject constructor(
     private val intervalsDao: SavedIntervalDao,
