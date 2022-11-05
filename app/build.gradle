@@ -49,10 +49,11 @@ android {
 dependencies {
 
     // General compose dependencies
-    implementation "androidx.activity:activity-compose:1.6.0"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.2.1"
+    implementation "androidx.activity:activity-compose:1.6.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.3.0"
 
     // Other compose dependencies
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
     // Compose for Wear OS Dependencies
     implementation "androidx.wear.compose:compose-material:1.0.2"
