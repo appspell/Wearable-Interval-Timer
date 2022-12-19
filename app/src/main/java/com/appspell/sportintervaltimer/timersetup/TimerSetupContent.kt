@@ -31,6 +31,7 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
 import androidx.wear.compose.material.rememberScalingLazyListState
+import com.appspell.sportintervaltimer.R.string
 import com.appspell.sportintervaltimer.theme.MainTheme
 import com.appspell.sportintervaltimer.timersetup.TimerSetupViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -72,6 +73,7 @@ fun TimerSetupContent(
                 setsText = state.sets,
                 workText = state.work,
                 restText = state.rest,
+                totalText = state.totalTimeSeconds.secondsToTimeDuration(),
                 onStart = { viewModel.onSave() },
                 onSetsAdd = { viewModel.onSetsAdd() },
                 onSetsRemove = { viewModel.onSetsRemove() },
@@ -86,10 +88,26 @@ fun TimerSetupContent(
 }
 
 @Composable
+private fun Int.secondsToTimeDuration(): String {
+    val hours = this / 60 / 60
+    val minutes = (this / 60) - hours
+
+    val hoursText = if (hours > 1) {
+        stringResource(id = string.hours, hours) + " "
+    } else {
+        ""
+    }
+    val minutesText = stringResource(id = string.minutes, minutes)
+    val totalText = "$hoursText$minutesText"
+    return totalText
+}
+
+@Composable
 private fun SetUpIntervalsContent(
     setsText: String,
     workText: String,
     restText: String,
+    totalText: String,
     onStart: () -> Unit,
     onSetsAdd: () -> Unit,
     onSetsRemove: () -> Unit,
@@ -138,6 +156,16 @@ private fun SetUpIntervalsContent(
                 defaultValue = restText,
                 onButtonAdd = onRestAdd,
                 onButtonRemove = onRestRemove
+            )
+        }
+        item {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                style = MaterialTheme.typography.caption2,
+                textAlign = TextAlign.Center,
+                text = stringResource(id = R.string.total_time, totalText),
             )
         }
         item {

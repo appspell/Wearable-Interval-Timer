@@ -48,8 +48,8 @@ class TimerSetupViewModel @Inject constructor(
 
     fun onSetsAdd() {
         dataState = dataState.copy(
-            sets = dataState.sets + 1
-        )
+            sets = dataState.sets + 1,
+        ).updateTotalTimeSeconds()
     }
 
     fun onSetsRemove() {
@@ -58,14 +58,14 @@ class TimerSetupViewModel @Inject constructor(
                 dataState.sets - 1
             } else {
                 0
-            }
-        )
+            },
+        ).updateTotalTimeSeconds()
     }
 
     fun onWorkAdd() {
         dataState = dataState.copy(
-            workSeconds = dataState.workSeconds + STEP_SECONDS
-        )
+            workSeconds = dataState.workSeconds + STEP_SECONDS,
+        ).updateTotalTimeSeconds()
     }
 
     fun onWorkRemove() {
@@ -74,14 +74,14 @@ class TimerSetupViewModel @Inject constructor(
                 dataState.workSeconds - STEP_SECONDS
             } else {
                 MIN_SECONDS
-            }
-        )
+            },
+        ).updateTotalTimeSeconds()
     }
 
     fun onRestAdd() {
         dataState = dataState.copy(
-            restSeconds = dataState.restSeconds + STEP_SECONDS
-        )
+            restSeconds = dataState.restSeconds + STEP_SECONDS,
+        ).updateTotalTimeSeconds()
     }
 
     fun onRestRemove() {
@@ -91,7 +91,7 @@ class TimerSetupViewModel @Inject constructor(
             } else {
                 MIN_SECONDS
             }
-        )
+        ).updateTotalTimeSeconds()
     }
 
     fun onSave() {
@@ -111,6 +111,16 @@ class TimerSetupViewModel @Inject constructor(
         TimerSetupUiState(
             sets = sets.toString(),
             work = workSeconds.toTimeString(),
-            rest = restSeconds.toTimeString()
+            rest = restSeconds.toTimeString(),
+            totalTimeSeconds = totalTimeSeconds
+        )
+
+    private fun TimerSetupDataState.updateTotalTimeSeconds() =
+        this.copy(
+            totalTimeSeconds = calculateTotalTime(
+                this.sets,
+                this.workSeconds,
+                this.restSeconds
+            )
         )
 }

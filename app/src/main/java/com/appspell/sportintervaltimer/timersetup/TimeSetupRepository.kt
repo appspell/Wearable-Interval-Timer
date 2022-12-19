@@ -52,7 +52,8 @@ class TimeSetupRepository @Inject constructor(
         TimerSetupDataState(
             sets = this.sets,
             workSeconds = this.workSeconds,
-            restSeconds = this.restSeconds
+            restSeconds = this.restSeconds,
+            totalTimeSeconds = calculateTotalTime(this.sets, this.workSeconds, this.restSeconds)
         )
 
     companion object {
@@ -60,6 +61,11 @@ class TimeSetupRepository @Inject constructor(
             sets = DEFAULT_SETS,
             workSeconds = DEFAULT_WORK_SECONDS,
             restSeconds = DEFAULT_REST_SECONDS,
+            totalTimeSeconds = calculateTotalTime(
+                DEFAULT_SETS,
+                DEFAULT_WORK_SECONDS,
+                DEFAULT_REST_SECONDS
+            )
         )
     }
 }
