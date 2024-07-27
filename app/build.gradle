@@ -15,8 +15,8 @@ android {
         applicationId "com.appspell.sportintervaltimer"
         minSdk 30
         targetSdk 34
-        versionCode 5
-        versionName "0.54"
+        versionCode 7
+        versionName "0.55"
 
         javaCompileOptions {
             annotationProcessorOptions {
